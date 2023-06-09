@@ -27,8 +27,17 @@ async function run() {
 // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const toyCollection = client.db('tinytoy').collection('toys');
+    const categoryCollection = client.db('tinytoy').collection('toyTabs');
+
+    app.get('/tabs',async(req,res)=>{
+      const cursor =categoryCollection.find();
+      const result =await cursor.toArray()
+      res.send(result)
+  })
+
+ 
+    // toy collection
     app.get('/toy',async(req,res)=>{ 
-      
       let query ={};
       if (req.query?.sellerEmail) {
         query={sellerEmail:req.query.sellerEmail}
@@ -37,31 +46,37 @@ async function run() {
       res.send(result)
      
     })
+  // 
+
+  
+  // get added all toys 
     app.get('/toy',async(req,res)=>{
       const cursor =toyCollection.find()
       const result =await cursor.toArray()
       res.send(result)
     })
-    
+    // get an unique toy for details
     app.get('/toy/:id',async(req,res)=>{
       const id =req.params.id;
       const query ={_id:new ObjectId(id)}
       const result =await toyCollection.findOne(query);
       res.send(result)
     })
-
+    // add a toy 
     app.post('/toy',async(req,res)=>{
       const toy =req.body;
       console.log(toy);
       const result = await toyCollection.insertOne(toy);
       res.send(result)
     })
+    // delete a toy from my toys
     app.delete('/toy/:id',async(req,res)=>{
       const id =req.params.id;
       const query ={_id:new ObjectId(id)}
       const result =await toyCollection.deleteOne(query)
       res.send(result)
     })
+    // update a toy from my toys
     app.put('/toy/:id',async(req,res)=>{
       const id =req.params.id;
       const filter ={ _id: new ObjectId(id)}
